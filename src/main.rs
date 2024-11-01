@@ -30,7 +30,7 @@ fn main() -> std::io::Result<()> {
     let path = args.path;
 
     //result
-    let mut sizes = folder_size(path)?;
+    let mut sizes = folder_size(&path)?;
 
     //display result somewhere
     size_display(&mut sizes, mode)?;
@@ -38,11 +38,9 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn folder_size(path: String) -> std::io::Result<Vec<Size>> {
+fn folder_size(path: &str) -> std::io::Result<Vec<Size>> {
     // read thr content of the folder, needs to be unwrapped
     // retun array
-    let path = path.clone();
-    let handle = std::thread::spawn(move || -> std::io::Result<Vec<Size>> {
         let mut sizes: Vec<Size> = Vec::new();
         if let Ok(folder_content_w) = fs::read_dir(&path) {
             //unwrap and collect the iterator
@@ -63,7 +61,7 @@ fn folder_size(path: String) -> std::io::Result<Vec<Size>> {
                     is_file = true;
                 } else {
                     let folder_path = format!("{}/{}", path, &name);
-                    let f_size = folder_size(folder_path)?;
+                    let f_size = folder_size(&folder_path)?;
 
                     size = f_size.iter().map(|x| x.size).sum();
                     is_file = false;
@@ -77,10 +75,7 @@ fn folder_size(path: String) -> std::io::Result<Vec<Size>> {
             }
         }
         Ok(sizes)
-    });
 
-    let result = handle.join().unwrap()?;
-    Ok(result)
 }
 
 fn size_display(sizes: &mut [Size], mode: u8) -> std::io::Result<()> {
