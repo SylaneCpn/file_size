@@ -50,30 +50,27 @@ fn folder_size(path: &str) -> std::io::Result<Vec<Size>> {
             //get the metadata
             let mdata = content.metadata().unwrap();
 
+            let name = content.file_name().into_string().unwrap();
+            let size;
+            let is_file;
+
             if mdata.is_file() {
-                //get file name
-                let name = content.file_name().into_string().unwrap();
                 //get size
-                let size = mdata.len();
-                let is_file = true;
-
-                sizes.push(Size {
-                    name,
-                    size,
-                    is_file,
-                });
+                size = mdata.len();
+                is_file = true;
             } else {
-                let f_name = content.file_name().into_string().unwrap();
-                let folder_path = format!("{}/{}", path, &f_name);
+                let folder_path = format!("{}/{}", path, &name);
                 let f_size = folder_size(&folder_path)?;
-                let size = f_size.iter().map(|x| x.size).sum();
 
-                sizes.push(Size {
-                    name: f_name,
-                    size,
-                    is_file: false,
-                });
+                size = f_size.iter().map(|x| x.size).sum();
+                is_file = false;
             }
+
+            sizes.push(Size {
+                name,
+                size,
+                is_file,
+            });
         }
     }
     Ok(sizes)
