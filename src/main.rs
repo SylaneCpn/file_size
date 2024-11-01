@@ -9,6 +9,7 @@ struct Cli {
     #[arg(short, long, default_value_t = 0)]
     mode: u8,
     /// Path to scan
+    #[arg(short, long, default_value_t = String::from("./"))]
     path: String,
 }
 
