@@ -42,46 +42,45 @@ fn folder_size(path: String) -> std::io::Result<Vec<Size>> {
     // retun array
     let path = path.clone();
     let handle = std::thread::spawn(move || -> std::io::Result<Vec<Size>> {
-    let mut sizes: Vec<Size> = Vec::new();
-    if let Ok(folder_content_w) = fs::read_dir(&path) {
-        //unwrap and collect the iterator
-        let folder_content: Vec<_> = folder_content_w.map(|c| c.unwrap()).collect();
+        let mut sizes: Vec<Size> = Vec::new();
+        if let Ok(folder_content_w) = fs::read_dir(&path) {
+            //unwrap and collect the iterator
+            let folder_content: Vec<_> = folder_content_w.map(|c| c.unwrap()).collect();
 
-        //scan each file/folder
-        for content in folder_content.iter() {
-            //get the metadata
-            let mdata = content.metadata().unwrap();
+            //scan each file/folder
+            for content in folder_content.iter() {
+                //get the metadata
+                let mdata = content.metadata().unwrap();
 
-            let name = content.file_name().into_string().unwrap();
-            let size;
-            let is_file;
+                let name = content.file_name().into_string().unwrap();
+                let size;
+                let is_file;
 
-            if mdata.is_file() {
-                //get size
-                size = mdata.len();
-                is_file = true;
-            } else {
-                let folder_path = format!("{}/{}", path, &name);
-                let f_size = folder_size(folder_path)?;
+                if mdata.is_file() {
+                    //get size
+                    size = mdata.len();
+                    is_file = true;
+                } else {
+                    let folder_path = format!("{}/{}", path, &name);
+                    let f_size = folder_size(folder_path)?;
 
-                size = f_size.iter().map(|x| x.size).sum();
-                is_file = false;
+                    size = f_size.iter().map(|x| x.size).sum();
+                    is_file = false;
+                }
+
+                sizes.push(Size {
+                    name,
+                    size,
+                    is_file,
+                });
             }
-
-            sizes.push(Size {
-                name,
-                size,
-                is_file,
-            });
         }
-    }
-    Ok(sizes)
+        Ok(sizes)
     });
 
     let result = handle.join().unwrap()?;
     Ok(result)
 }
-
 
 fn size_display(sizes: &mut [Size], mode: u8) -> std::io::Result<()> {
     sizes.sort_by_key(|k| k.size);
