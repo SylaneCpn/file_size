@@ -79,6 +79,7 @@ fn folder_size(path: &str) -> std::io::Result<Vec<Size>> {
 
 fn size_display(sizes: &mut [Size], mode: u8) -> std::io::Result<()> {
     sizes.sort_by_key(|k| k.size);
+    sizes.reverse();
     let mut to_write = String::new();
 
     sizes.iter().for_each(|x| {
