@@ -114,16 +114,11 @@ fn size_unit(size: u64) -> String {
             break;
         }
     }
-
-    if dept == 0 {
-        format!("{} b", original_size)
-    } else if dept == 1 {
-        format!("{} Kb", original_size / 1_000.0)
-    } else if dept == 2 {
-        format!("{} Mb", original_size / 1_000_000.0)
-    } else if dept == 3 {
-        format!("{} Gb", original_size / 1_000_000_000.0)
-    } else {
-        format!("{} Tb", original_size / 1_000_000_000_000.0)
+    match dept {
+        0 => format!("{} b", original_size),
+        1 => format!("{} Kb", original_size / 1_000.0),
+        2 => format!("{} Mb", original_size / 1_000_000.0),
+        3 => format!("{} Gb", original_size / 1_000_000_000.0),
+        _ => format!("{} Tb", original_size / 1_000_000_000_000.0),
     }
 }
